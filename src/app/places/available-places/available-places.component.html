@@ -1,4 +1,6 @@
 <app-places-container title="Available Places">
+  <p *ngIf="isFetching" class="fallback-text">Fetching available places...</p>
+
   <ng-container *ngIf="places; else noPlaces">
     <app-places [places]="places" />
   </ng-container>

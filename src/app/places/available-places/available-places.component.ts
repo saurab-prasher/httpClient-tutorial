@@ -19,11 +19,14 @@ export class AvailablePlacesComponent implements OnInit, OnDestroy {
   // places = signal<Place[] | undefined>(undefined);
   places: Place[] = [];
 
+  isFetching = false;
+
   // private destroyRef = inject(DestroyRef);
   private subscription!: Subscription;
   constructor(private httpClient: HttpClient) {}
 
   ngOnInit() {
+    this.isFetching = true;
     this.subscription = this.httpClient
       .get<{
         places: Place[];
@@ -36,6 +39,7 @@ export class AvailablePlacesComponent implements OnInit, OnDestroy {
           console.log(places);
           this.places = places;
         },
+        complete: () => (this.isFetching = false),
       });
 
     // this.destroyRef.onDestroy(() => subscription.unsubscribe());
