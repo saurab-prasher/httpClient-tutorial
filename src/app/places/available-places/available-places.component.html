@@ -1,0 +1,10 @@
+<app-places-container title="Available Places">
+  <ng-container *ngIf="places; else noPlaces">
+    <app-places [places]="places" />
+  </ng-container>
+  <ng-template #noPlaces>
+    <ng-container *ngIf="places?.length === 0">
+      <p class="fallback-text">Unfortunately, no places could be found.</p>
+    </ng-container>
+  </ng-template>
+</app-places-container>
