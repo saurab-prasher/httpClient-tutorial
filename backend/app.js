@@ -39,7 +39,7 @@ app.get("/user-places", async (req, res) => {
 app.put("/user-places", async (req, res) => {
   const placeId = req.body.placeId;
 
-  // res.status(500).json();
+  // return res.status(500).json();
 
   try {
     const fileContent = await fs.readFile("./data/places.json", "utf-8");

@@ -11,6 +11,7 @@ import {
   tap,
   throwError,
 } from 'rxjs';
+import { ErrorService } from '../../shared/error.service';
 
 @Injectable({
   providedIn: 'root',
@@ -19,7 +20,10 @@ export class PlacesService {
   private _userPlaces = new BehaviorSubject<Place[]>([]);
   loadedUserPlaces = this._userPlaces.asObservable();
 
-  constructor(private httpClient: HttpClient) {}
+  constructor(
+    private httpClient: HttpClient,
+    private errorService: ErrorService
+  ) {}
 
   loadAvailablePlaces() {
     return this.fetchPlaces(
@@ -33,9 +37,8 @@ export class PlacesService {
       'http://localhost:3000/user-places',
       'Something went wrong fetching the available places. Please try again later.'
     ).pipe(
-      map((userPlaces) => {
-        const places = [...userPlaces];
-        this._userPlaces.next(places);
+      tap((userPlaces) => {
+        this._userPlaces.next(userPlaces);
       })
     );
   }
@@ -50,9 +53,13 @@ export class PlacesService {
     return this.httpClient
       .put('http://localhost:3000/user-places', { placeId: place.id })
       .pipe(
-        catchError((error) =>
-          throwError(() => new Error('Failed to add place to user places'))
-        )
+        catchError((error) => {
+          this._userPlaces.next(prevPlaces);
+          this.errorService.showError('Failed to add place to user places');
+          return throwError(
+            () => new Error('Failed to add place to user places')
+          );
+        })
       );
 
     // this._userPlaces

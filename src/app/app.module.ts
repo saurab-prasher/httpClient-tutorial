@@ -9,6 +9,7 @@ import { AvailablePlacesModule } from './places/available-places/available-place
 import { UserPlacesModule } from './places/user-places/user-places.module';
 import { PlacesContainerModule } from './places/places-container/places-container.module';
 import { PlacesModule } from './places/places.module';
+import { ErrorModalComponent } from '../shared/modal/error-modal/error-modal.component';
 
 @NgModule({
   declarations: [AppComponent],
@@ -19,6 +20,7 @@ import { PlacesModule } from './places/places.module';
     UserPlacesModule,
     PlacesContainerModule,
     PlacesModule,
+    ErrorModalComponent,
   ],
   providers: [provideHttpClient()],
   bootstrap: [AppComponent],
