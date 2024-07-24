@@ -1,3 +1,17 @@
 <app-places-container title="Your Favorite Places">
-  <p>Todo...</p>
+  <p *ngIf="isFetching && !error" class="fallback-text">
+    Fetching favorite places...
+  </p>
+
+  <p class="fallback-text" *ngIf="error">
+    An error occurred while fetching places: {{ error }}
+  </p>
+  <app-places *ngIf="places && places.length > 0" [places]="places" />
+
+  <p
+    *ngIf="!isFetching && (!places || places.length === 0)"
+    class="fallback-text"
+  >
+    Unfortunately, no places could be found.
+  </p>
 </app-places-container>

@@ -9,7 +9,8 @@
   <app-places
     *ngIf="places && places.length > 0"
     [places]="places"
-  ></app-places>
+    (selectPlace)="onSelectPlace($event)"
+  />
 
   <p
     *ngIf="!isFetching && (!places || places.length === 0)"
