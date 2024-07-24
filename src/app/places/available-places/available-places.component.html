@@ -1,12 +1,20 @@
 <app-places-container title="Available Places">
-  <p *ngIf="isFetching" class="fallback-text">Fetching available places...</p>
+  <p *ngIf="isFetching && !error" class="fallback-text">
+    Fetching available places...
+  </p>
 
-  <ng-container *ngIf="places; else noPlaces">
-    <app-places [places]="places" />
-  </ng-container>
-  <ng-template #noPlaces>
-    <ng-container *ngIf="places?.length === 0">
-      <p class="fallback-text">Unfortunately, no places could be found.</p>
-    </ng-container>
-  </ng-template>
+  <p class="fallback-text" *ngIf="error">
+    An error occurred while fetching places: {{ error }}
+  </p>
+  <app-places
+    *ngIf="places && places.length > 0"
+    [places]="places"
+  ></app-places>
+
+  <p
+    *ngIf="!isFetching && (!places || places.length === 0)"
+    class="fallback-text"
+  >
+    Unfortunately, no places could be found.
+  </p>
 </app-places-container>
