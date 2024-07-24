@@ -1,14 +1,6 @@
-import {
-  Component,
-  DestroyRef,
-  inject,
-  OnDestroy,
-  OnInit,
-  signal,
-} from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Place } from '../place.model';
-import { HttpClient } from '@angular/common/http';
-import { catchError, map, Subscription, throwError } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { PlacesService } from '../places.service';
 
 @Component({
@@ -31,7 +23,6 @@ export class AvailablePlacesComponent implements OnInit, OnDestroy {
     this.isFetching = true;
     this.subscription = this.placesService.loadAvailablePlaces().subscribe({
       next: (places) => {
-        console.log(places);
         this.places = places;
       },
       error: (error: Error) => {
@@ -45,7 +36,7 @@ export class AvailablePlacesComponent implements OnInit, OnDestroy {
   }
 
   onSelectPlace(selectedPlace: Place) {
-    this.placesService.addPlaceToUserPlaces(selectedPlace.id);
+    this.placesService.addPlaceToUserPlaces(selectedPlace).subscribe();
   }
 
   ngOnDestroy(): void {

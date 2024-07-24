@@ -1,19 +1,25 @@
-import { Injectable, signal } from '@angular/core';
-
+import { Injectable } from '@angular/core';
 import { Place } from './place.model';
 import { HttpClient } from '@angular/common/http';
-
-import { catchError, map, Subscription, throwError } from 'rxjs';
+import {
+  BehaviorSubject,
+  catchError,
+  map,
+  mergeMap,
+  of,
+  take,
+  tap,
+  throwError,
+} from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PlacesService {
-  private userPlaces = signal<Place[]>([]);
+  private _userPlaces = new BehaviorSubject<Place[]>([]);
+  loadedUserPlaces = this._userPlaces.asObservable();
 
   constructor(private httpClient: HttpClient) {}
-
-  loadedUserPlaces = this.userPlaces.asReadonly();
 
   loadAvailablePlaces() {
     return this.fetchPlaces(
@@ -26,19 +32,50 @@ export class PlacesService {
     return this.fetchPlaces(
       'http://localhost:3000/user-places',
       'Something went wrong fetching the available places. Please try again later.'
+    ).pipe(
+      map((userPlaces) => {
+        const places = [...userPlaces];
+        this._userPlaces.next(places);
+      })
     );
   }
 
-  addPlaceToUserPlaces(placeId: string) {
+  addPlaceToUserPlaces(place: Place) {
+    const prevPlaces = [...this._userPlaces.value];
+
+    if (!prevPlaces.some((p) => p.id === place.id)) {
+      this._userPlaces.next([...prevPlaces, place]);
+    }
+
     return this.httpClient
-      .put('http://localhost:3000/user-places', {
-        placeId,
-      })
-      .subscribe({
-        next: (resData) => {
-          console.log(resData);
-        },
-      });
+      .put('http://localhost:3000/user-places', { placeId: place.id })
+      .pipe(
+        catchError((error) =>
+          throwError(() => new Error('Failed to add place to user places'))
+        )
+      );
+
+    // this._userPlaces
+    //   .pipe(
+    //     take(1),
+    //     mergeMap((userPlaces) => {
+    //       if (!userPlaces.some((p) => p.id === placeId)) {
+    //         return this.httpClient
+    //           .put('http://localhost:3000/user-places', { placeId })
+    //           .pipe(
+    //             mergeMap(() => this.loadUserPlaces()),
+    //             catchError((error) =>
+    //               throwError(
+    //                 () => new Error('Failed to add place to user places')
+    //               )
+    //             )
+    //           );
+    //       } else {
+    //         return of(null); // Return an  null  observable  if place is already present
+    //       }
+    //     })
+    //   )
+    //   .subscribe();
   }
 
   removeUserPlace(place: Place) {}
