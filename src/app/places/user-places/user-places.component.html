@@ -6,7 +6,11 @@
   <p class="fallback-text" *ngIf="error">
     An error occurred while fetching places: {{ error }}
   </p>
-  <app-places *ngIf="places && places.length > 0" [places]="places" />
+  <app-places
+    (deletePlace)="deletePlace($event)"
+    *ngIf="places && places.length > 0"
+    [places]="places"
+  />
 
   <p
     *ngIf="!isFetching && (!places || places.length === 0)"

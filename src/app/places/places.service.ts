@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Place } from './place.model';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import {
   BehaviorSubject,
   catchError,
@@ -85,7 +85,29 @@ export class PlacesService {
     //   .subscribe();
   }
 
-  removeUserPlace(place: Place) {}
+  removeUserPlace(place: Place) {
+    const prevPlaces = [...this._userPlaces.value];
+
+    // Optimistic update
+    if (prevPlaces.some((p) => p.id === place.id)) {
+      const updatedPlaces = prevPlaces.filter((p) => p.id !== place.id);
+      this._userPlaces.next(updatedPlaces);
+    }
+
+    return this.httpClient
+      .delete(`http://localhost:3000/user-places/${place.id}`)
+      .pipe(
+        catchError((error) => {
+          this._userPlaces.next(prevPlaces);
+          this.errorService.showError(
+            'Failed to remove place from user places'
+          );
+          return throwError(
+            () => new Error('Failed to remove place to user places')
+          );
+        })
+      );
+  }
 
   private fetchPlaces(url: string, errorMessage: string) {
     return this.httpClient
